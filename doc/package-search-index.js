@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.polinc.dummycastle"},{"l":"com.polinc.dummycastle.coding"},{"l":"com.polinc.dummycastle.crypt.asymm"},{"l":"com.polinc.dummycastle.crypt.symm"},{"l":"com.polinc.dummycastle.hash"},{"l":"com.polinc.dummycastle.obfuscate"},{"l":"com.polinc.dummycastle.random"}];updateSearchResults();
