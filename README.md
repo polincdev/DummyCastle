@@ -1,2 +1,2 @@
 # DummyCastle
-Cryptography for dummies
+Cryptography for dummies.
