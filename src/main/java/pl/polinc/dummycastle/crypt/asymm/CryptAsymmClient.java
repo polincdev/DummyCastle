@@ -6,7 +6,8 @@ public class CryptAsymmClient {
 
 	CryptSymmKey cryptSymmKey;
 
- 	public CryptAsymmClient(CryptSymmKey cryptSymmKey) {
+	// Domyslae - prosty algorytw XOR
+	public CryptAsymmClient(CryptSymmKey cryptSymmKey) {
 		this.cryptSymmKey = cryptSymmKey;
 
 	}

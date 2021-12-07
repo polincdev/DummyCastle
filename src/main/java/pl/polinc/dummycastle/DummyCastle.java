@@ -6,10 +6,10 @@ import pl.polinc.dummycastle.coding.Coder;
 import pl.polinc.dummycastle.crypt.asymm.CryptAsymm;
 import pl.polinc.dummycastle.crypt.asymm.CryptAsymmKey;
 import pl.polinc.dummycastle.crypt.asymm.CryptAsymmKeys;
-import pl.polinc.dummycastle.crypt.asymm.CryptAsymmKeys.KEY_SIZE_TYPE;
 import pl.polinc.dummycastle.crypt.asymm.CryptAsymmKeysPair;
 import pl.polinc.dummycastle.crypt.asymm.CryptAsymmPrivateKey;
 import pl.polinc.dummycastle.crypt.asymm.CryptAsymmPublicKey;
+import pl.polinc.dummycastle.crypt.asymm.CryptAsymmKeys.KEY_SIZE_TYPE;
 import pl.polinc.dummycastle.crypt.symm.CryptSymm;
 import pl.polinc.dummycastle.crypt.symm.CryptSymmKey;
 import pl.polinc.dummycastle.hash.HashClient;
@@ -18,10 +18,14 @@ import pl.polinc.dummycastle.hash.PermutClient;
 import pl.polinc.dummycastle.obfuscate.ObfuscateClient;
 import pl.polinc.dummycastle.random.RandomClient;
 
+/**
+ * @author polinc
+ *
+ */
 public class DummyCastle {
 
-	private String resultStr = "";
-	private boolean error = false; 
+	byte[] resultBytes = new byte[0];
+	private boolean error = false;
 	private Exception exception = new Exception();
 	private CryptSymmKey cryptSymmKey;
 
@@ -34,22 +38,18 @@ public class DummyCastle {
 	 * @param plainText to encrypt.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle encryptSymm(String plainText) {
+	public DummyCastle encryptSymmWith(String plainText) {
 
 		if (plainText == null || plainText.isEmpty() || cryptSymmKey == null) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			byte[] encryptedBytes = CryptSymm.encryptStream(plainText.getBytes(), cryptSymmKey);
-			String secretText = new String(encryptedBytes);
-			resultStr = secretText;
+			resultBytes = CryptSymm.encryptStream(plainText.getBytes(), cryptSymmKey);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 		return this;
 	}
@@ -63,20 +63,16 @@ public class DummyCastle {
 	 */
 	public DummyCastle encryptSymm() {
 
-		if (resultStr == null || resultStr.isEmpty() || cryptSymmKey == null) {
+		if (resultBytes == null || resultBytes.length == 0 || cryptSymmKey == null) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			byte[] encryptedBytes = CryptSymm.encryptStream(resultStr.getBytes(), cryptSymmKey);
-			String secretText = new String(encryptedBytes);
-			resultStr = secretText;
+			resultBytes = CryptSymm.encryptStream(resultBytes, cryptSymmKey);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 		return this;
 	}
@@ -88,22 +84,18 @@ public class DummyCastle {
 	 * @param secretText to decrypt.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle decryptSymm(String secretText) {
+	public DummyCastle decryptSymmWith(String secretText) {
 
 		if (secretText == null || secretText.isEmpty() || cryptSymmKey == null) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			byte[] encryptedBytes = CryptSymm.decryptStream(secretText.getBytes(), cryptSymmKey);
-			String plainText = new String(encryptedBytes);
-			resultStr = plainText;
+			resultBytes = CryptSymm.decryptStream(Coder.decodeString2Bytes(secretText), cryptSymmKey);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -118,105 +110,41 @@ public class DummyCastle {
 	 */
 	public DummyCastle decryptSymm() {
 
-		if (resultStr == null || resultStr.isEmpty() || cryptSymmKey == null) {
+		if (resultBytes == null || resultBytes.length == 0 || cryptSymmKey == null) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
 		try {
-			byte[] encryptedBytes = CryptSymm.decryptStream(resultStr.getBytes(), cryptSymmKey);
-			String plainText = new String(encryptedBytes);
-			resultStr = plainText;
+			resultBytes = CryptSymm.decryptStream(resultBytes, cryptSymmKey);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
 	}
 
 	/**
-	 * Encrypts provided text using symmetric encryption and encodes the result
-	 * using HEX encoding. The result may be obtained using getResult() method.
-	 * 
-	 * @param plainText to encrypt and encode.
-	 * @return this object for chaining.
-	 */
-	public DummyCastle encryptSymmWithCoding(String plainText) {
-
-		if (plainText == null || plainText.isEmpty() || cryptSymmKey == null) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-		resultStr = "";
-		try {
-			byte[] encryptedBytes = CryptSymm.encryptStream(plainText.getBytes(), cryptSymmKey);
-			resultStr = new String(Coder.encode(encryptedBytes));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Decodes and decrypts provided text using symmetric encryption. The result may
-	 * be obtained using getResult() method.
-	 * 
-	 * @param secretText to decode and decrypt.
-	 * @return this object for chaining.
-	 */
-	public DummyCastle decryptSymmWithCoding(String secretText) {
-
-		if (secretText == null || secretText.isEmpty() || cryptSymmKey == null) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-		resultStr = "";
-		try {
-			byte[] decodedBytes = Coder.decode(secretText.getBytes());
-			byte[] decryptedBytes = CryptSymm.decryptStream(decodedBytes, cryptSymmKey);
-			resultStr = new String(decryptedBytes);
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Encrypts provided plain text using symmetric encryption and encodes the
-	 * result using HEX encoding. The result may be obtained using getResult()
-	 * method.
+	 * Encrypts provided plain text using symmetric encryption. The result may be
+	 * obtained using getResult() method.
 	 * 
 	 * @param plainText to encrypt and encode.
 	 * @param keyPos    starting position of the key used to encrypt previous chunks
 	 *                  of data.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle encryptSymmFromWithCoding(String plainText, int keyPos) {
+	public DummyCastle encryptSymmFromWith(String plainText, int keyPos) {
 
 		if (plainText == null || plainText.isEmpty() || cryptSymmKey == null || keyPos < 0) {
 			exception = new IllegalArgumentException("Empty or null or <0 argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			byte[] encryptedBytes = CryptSymm.encryptStreamFrom(plainText.getBytes(), cryptSymmKey, keyPos);
-			resultStr = new String(Coder.encode(encryptedBytes));
+			resultBytes = CryptSymm.encryptStreamFrom(plainText.getBytes(), cryptSymmKey, keyPos);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -231,22 +159,18 @@ public class DummyCastle {
 	 *                   chunks of data.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle decryptSymmFromWithCoding(String secretText, int keyPos) {
+	public DummyCastle decryptSymmFromWith(String secretText, int keyPos) {
 
 		if (secretText == null || secretText.isEmpty() || cryptSymmKey == null || keyPos < 0) {
 			exception = new IllegalArgumentException("Empty or null or <0 argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			byte[] decodedBytes = Coder.decode(secretText.getBytes());
-			byte[] decryptedBytes = CryptSymm.decryptStreamFrom(decodedBytes, cryptSymmKey, keyPos);
-			resultStr = new String(decryptedBytes);
+			resultBytes = CryptSymm.decryptStreamFrom(Coder.decodeString2Bytes(secretText), cryptSymmKey, keyPos);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -283,7 +207,7 @@ public class DummyCastle {
 	 * 
 	 * @return this object for chaining.
 	 */
-	public DummyCastle genSymmKey() {
+	public DummyCastle genSymmKeyWith() {
 		try {
 			cryptSymmKey = new CryptSymmKey();
 		} catch (Exception e) {
@@ -302,7 +226,7 @@ public class DummyCastle {
 	 *                key. The same seed would provide the same key.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle genSymmKey(String keySeed) {
+	public DummyCastle genSymmKeyWith(String keySeed) {
 
 		if (keySeed == null || keySeed.isEmpty()) {
 			exception = new IllegalArgumentException("Empty or null argument");
@@ -315,7 +239,7 @@ public class DummyCastle {
 		} catch (Exception e) {
 			exception = e;
 			error = true;
-			cryptSymmKey = null;
+			cryptSymmKey = new CryptSymmKey();
 		}
 
 		return this;
@@ -334,22 +258,45 @@ public class DummyCastle {
 	 *                  text.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle encryptAsymm(String plainText, CryptAsymmKey key) {
+	public DummyCastle encryptAsymmWith(String plainText, CryptAsymmKey key) {
 
 		if (plainText == null || plainText.isEmpty() || key == null) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			byte[] encryptedBytes = CryptAsymm.encryptStream(plainText.getBytes(), key);
-			String secretText = new String(encryptedBytes);
-			resultStr = secretText;
+			resultBytes = CryptAsymm.encryptStream(plainText.getBytes(), key);
 		} catch (Exception e) {
-			exception = e;
+			setUpError(e);
+		}
+
+		return this;
+	}
+
+	/**
+	 * Encrypts data internally using asymmetric encryption. The result may be
+	 * obtained using getResult() method and it is not encoded. Use decryptSymm() to
+	 * decrypt the result. Use decryptAsymm() to decrypt.
+	 * 
+	 * @param key contains data used to encrypt plain text. If it is an instance of
+	 *            a CryptAsymmPublicKey class, a CryptAsymmPrivateKey object should
+	 *            be used to decrypt the text.
+	 * @return this object for chaining.
+	 */
+	public DummyCastle encryptAsymmWithKey(CryptAsymmKey key) {
+
+		if (resultBytes == null || resultBytes.length == 0 || key == null) {
+			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
-			resultStr = "";
+			return this;
+		}
+
+		try {
+			resultBytes = CryptAsymm.encryptStream(resultBytes, key);
+		} catch (Exception e) {
+			setUpError(e);
 		}
 
 		return this;
@@ -365,87 +312,46 @@ public class DummyCastle {
 	 *                   CryptAsymmPrivateKey was used to encrypt the text.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle decryptAsymm(String secretText, CryptAsymmKey key) {
+	public DummyCastle decryptAsymmWith(String secretText, CryptAsymmKey key) {
 
 		if (secretText == null || secretText.isEmpty() || key == null) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			byte[] encryptedBytes = CryptAsymm.decryptStream(secretText.getBytes(), key);
-			String plainText = new String(encryptedBytes);
-			resultStr = plainText;
+			resultBytes = CryptAsymm.decryptStream(Coder.decodeHex(secretText.getBytes()), key);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
 	}
 
 	/**
-	 * Encrypts provided plain text using asymmetric encryption and encodes the
-	 * result using HEX encoding. The result may be obtained using getResult()
-	 * method. Use decryptAsymmWithCoding() to decrypt.
-	 * 
-	 * @param plainText to encrypt and encode.
-	 * @param key       contains data used to encrypt plain text. If it is an
-	 *                  instance of a CryptAsymmPublicKey class, a
-	 *                  CryptAsymmPrivateKey object should be used to decrypt the
-	 *                  text.
-	 * @return this object for chaining.
-	 */
-	public DummyCastle encryptAsymmWithCoding(String plainText, CryptAsymmKey key) {
-
-		if (plainText == null || plainText.isEmpty() || key == null) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-		resultStr = "";
-		try {
-			byte[] encryptedBytes = CryptAsymm.encryptStream(plainText.getBytes(), key);
-			String secretText = new String(Coder.encode(encryptedBytes));
-			resultStr = secretText;
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Decrypts provided text using asymmetric encryption. The result may be
+	 * Decrypts dta internally using asymmetric encryption. The result may be
 	 * obtained using getResult() method and it is not encoded.
 	 * 
-	 * @param secretText text to decrypt.
-	 * @param key        contains data used to crypt plain text. It should be an
-	 *                   instance of a CryptAsymmPublicKey class if
-	 *                   CryptAsymmPrivateKey was used to encrypt the text.
+	 * @param key contains data used to crypt plain text. It should be an instance
+	 *            of a CryptAsymmPublicKey class if CryptAsymmPrivateKey was used to
+	 *            encrypt the text.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle decryptAsymmWithCoding(String secretText, CryptAsymmKey key) {
+	public DummyCastle decryptAsymmWithKey(CryptAsymmKey key) {
 
-		if (secretText == null || secretText.isEmpty() || key == null) {
+		if (resultBytes == null || resultBytes.length == 0 || key == null) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			byte[] decodedBytes = Coder.decode(secretText.getBytes());
-			byte[] encryptedBytes = CryptAsymm.decryptStream(decodedBytes, key);
-			resultStr = new String(encryptedBytes);
+			resultBytes = CryptAsymm.decryptStream(resultBytes, key);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
+
 		return this;
 	}
 
@@ -482,7 +388,7 @@ public class DummyCastle {
 	 * @return CryptAsymmKeysPair object containing asymmetric keys data, both
 	 *         public and private.
 	 */
-	public CryptAsymmKeysPair genAsymmKeys(KEY_SIZE_TYPE keySizeType) {
+	public CryptAsymmKeysPair genAsymmKeysWithKeySizeType(KEY_SIZE_TYPE keySizeType) {
 
 		try {
 			return new CryptAsymmKeys().generateKeys();
@@ -504,12 +410,11 @@ public class DummyCastle {
 	 * @return CryptAsymmKeysPair object containing asymmetric keys data, both
 	 *         public and private.
 	 */
-	public CryptAsymmPublicKey genAsymmPublicKey(String keyData) {
+	public CryptAsymmPublicKey genAsymmPublicKeyWith(String keyData) {
 
 		try {
 			return CryptAsymmPublicKey.createFromString(keyData);
 		} catch (Exception e) {
-			e.printStackTrace();
 			exception = e;
 			error = true;
 		}
@@ -524,7 +429,7 @@ public class DummyCastle {
 	 * @return CryptAsymmKeysPair object containing asymmetric keys data, both
 	 *         public and private.
 	 */
-	public CryptAsymmPrivateKey genAsymmPrivateKey(String keyData) {
+	public CryptAsymmPrivateKey genAsymmPrivateKeyWith(String keyData) {
 
 		try {
 			return CryptAsymmPrivateKey.createFromString(keyData);
@@ -543,20 +448,18 @@ public class DummyCastle {
 	 * @param textToDecode text to be encoded. Must be non-null and not empty.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle encode(String textToDecode) {
+	public DummyCastle encodeWith(String textToDecode) {
 
 		if (textToDecode == null || textToDecode.isEmpty()) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			resultStr = new String(Coder.encode(textToDecode));
+			resultBytes = Coder.encode(textToDecode.getBytes());
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -566,76 +469,27 @@ public class DummyCastle {
 	 * Decodes a text using HEX encoding. The result may be obtained using
 	 * getResult().
 	 * 
-	 * @param textToDecode text to be decoded. Must be non-null nor empty.
+	 * @param encodedText text to be decoded. Must be non-null nor empty.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle decode(String encodedText) {
+	public DummyCastle decodeWith(String encodedText) {
 
 		if (encodedText == null || encodedText.isEmpty()) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			resultStr = new String(Coder.decode(encodedText));
+			resultBytes = Coder.decode(encodedText.getBytes());
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
 	}
 
-	/* ENCODE */
-	/**
-	 * Encodes a text internally using HEX encoding. The result may be obtained
-	 * using getResult(). Use decode() method to decode.
-	 * 
-	 * @return this object for chaining.
-	 */
-	public DummyCastle encode() {
-
-		if (resultStr.isEmpty()) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-
-		try {
-			resultStr = new String(Coder.encode(resultStr));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Decodes a text internally using HEX encoding. The result may be obtained
-	 * using getResult().
-	 * 
-	 * @return this object for chaining.
-	 */
-	public DummyCastle decode() {
-		if (resultStr.isEmpty()) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-		try {
-			resultStr = new String(Coder.decode(resultStr));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
+	 
 
 	/* HASH */
 	/**
@@ -644,20 +498,18 @@ public class DummyCastle {
 	 * @param textToHash to hash. Must not be null nor empty.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle hashToNum(String textToHash) {
+	public DummyCastle hashToNumWith(String textToHash) {
 
 		if (textToHash == null || textToHash.isEmpty()) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
-		resultStr = "";
+
 		try {
-			resultStr = String.valueOf(HashClient.defaultHash(textToHash));
+			resultBytes = String.valueOf(HashClient.defaultHash(textToHash)).getBytes();
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -667,23 +519,20 @@ public class DummyCastle {
 	 * Hashes(reduces) a text internally into a long number represented as a string.
 	 * The result may be obtained using getResult() method.
 	 * 
-	 * @param textToHash to hash. Must not be null nor empty.
 	 * @return this object for chaining.
 	 */
 	public DummyCastle hashToNum() {
 
-		if (resultStr.isEmpty()) {
+		if (resultBytes.length == 0) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
 
 		try {
-			resultStr = String.valueOf(HashClient.defaultHash(resultStr));
+			resultBytes = String.valueOf(HashClient.defaultHash(resultBytes)).getBytes();
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -696,20 +545,18 @@ public class DummyCastle {
 	 * @param textToHash to hash. Must not be null nor empty.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle hashToStr(String plainText) {
+	public DummyCastle hashToStrWith(String textToHash) {
 
-		if (plainText == null || plainText.isEmpty()) {
+		if (textToHash == null || textToHash.isEmpty()) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
 
 		try {
-			resultStr = HasherClient.hash(plainText, 8);
+			resultBytes = HasherClient.hash(textToHash.getBytes(), 8);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -719,132 +566,26 @@ public class DummyCastle {
 	 * Hashes(reduces) a text internally into a string. The result may be obtained
 	 * using getResult() method.
 	 * 
-	 * @param textToHash to hash. Must not be null nor empty.
 	 * @return this object for chaining.
 	 */
 	public DummyCastle hashToStr() {
 
-		if (resultStr.isEmpty()) {
+		if (resultBytes.length == 0) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
 
 		try {
-			resultStr = HasherClient.hash(resultStr, 8);
+			resultBytes = HasherClient.hash(resultBytes, 8);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
 	}
 
-	/**
-	 * Hashes(reduces) a provided text into a 8 characters string and applies an
-	 * encoding. The result may be obtained using getResult() method.
-	 * 
-	 * @param textToHash to hash. Must not be null nor empty.
-	 * @return this object for chaining.
-	 */
-	public DummyCastle hashToStrWithCoding(String textToHash) {
-
-		if (textToHash == null || textToHash.isEmpty()) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-
-		try {
-			resultStr = new String(Coder.encode(HasherClient.hash(textToHash, 8)));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Hashes(reduces) a text internally into a 8 characters string and applies an
-	 * encoding. The result may be obtained using getResult() method.
-	 * 
-	 * @param textToHash to hash. Must not be null nor empty.
-	 * @return this object for chaining.
-	 */
-	public DummyCastle hashToStrWithCoding() {
-
-		if (resultStr.isEmpty()) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-
-		try {
-			resultStr = new String(Coder.encode(HasherClient.hash(resultStr, 8)));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Hashes(reduces) a provided text into a string of desired length and applies
-	 * an encoding. The result may be obtained using getResult() method.
-	 * 
-	 * @param textToHash     text to hash. Must not be null nor empty.
-	 * @param hashLenInChars the length in characters of the resulting hash value.
-	 * @return this object for chaining.
-	 */
-	public DummyCastle hashToStrWithCoding(String plainText, int hashLenInChars) {
-
-		if (plainText == null || plainText.isEmpty() || hashLenInChars < 0) {
-			exception = new IllegalArgumentException("Empty or null or <0 argument");
-			error = true;
-			return this;
-		}
-
-		try {
-			resultStr = new String(Coder.encode(HasherClient.hash(plainText, hashLenInChars)));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Hashes(reduces) a text internally into a string of desired length and applies
-	 * an encoding. The result may be obtained using getResult() method.
-	 * 
-	 * @param textToHash     to hash. Must not be null nor empty.
-	 * @param hashLenInChars the length in characters of the resulting hash value.
-	 * @return this object for chaining.
-	 */
-	public DummyCastle hashToStrWithCoding(int hashLenInChars) {
-
-		if (resultStr.isEmpty() || hashLenInChars < 0) {
-			exception = new IllegalArgumentException("Empty or null or <0 argument");
-			error = true;
-			return this;
-		}
-
-		try {
-			resultStr = new String(Coder.encode(HasherClient.hash(resultStr, hashLenInChars)));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-		return this;
-	}
+	 
 
 	/* OBFUSCATE */
 	/**
@@ -854,7 +595,7 @@ public class DummyCastle {
 	 * @param textToObfuscate to obfuscate. Must not be null nor empty.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle obfuscate(String textToObfuscate) {
+	public DummyCastle obfuscateWith(String textToObfuscate) {
 
 		if (textToObfuscate == null || textToObfuscate.isEmpty()) {
 			exception = new IllegalArgumentException("Empty or null argument");
@@ -863,11 +604,9 @@ public class DummyCastle {
 		}
 
 		try {
-			resultStr = new String(ObfuscateClient.obfuscate(textToObfuscate.getBytes()));
+			resultBytes = ObfuscateClient.obfuscate(textToObfuscate.getBytes());
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -881,18 +620,16 @@ public class DummyCastle {
 	 */
 	public DummyCastle obfuscate() {
 
-		if (resultStr == null || resultStr.isEmpty()) {
+		if (resultBytes == null || resultBytes.length == 0) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
 
 		try {
-			resultStr = new String(ObfuscateClient.obfuscate(resultStr.getBytes()));
+			resultBytes = ObfuscateClient.obfuscate(resultBytes);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -905,7 +642,7 @@ public class DummyCastle {
 	 * @param obfuscatedText to obfuscate. Must not be null nor empty.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle unobfuscate(String obfuscatedText) {
+	public DummyCastle unobfuscateWith(String obfuscatedText) {
 
 		if (obfuscatedText == null || obfuscatedText.isEmpty()) {
 			exception = new IllegalArgumentException("Empty or null argument");
@@ -914,11 +651,9 @@ public class DummyCastle {
 		}
 
 		try {
-			resultStr = new String(ObfuscateClient.unobfuscate(obfuscatedText.getBytes()));
+			resultBytes = ObfuscateClient.unobfuscate(Coder.decodeString2Bytes(obfuscatedText));
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -928,125 +663,20 @@ public class DummyCastle {
 	 * Unobfuscates(reveals) a text provided by a previous operation. The result may
 	 * be obtained using getResult() method.
 	 * 
-	 * @param obfuscatedText to obfuscate. Must not be null nor empty.
 	 * @return this object for chaining.
 	 */
 	public DummyCastle unobfuscate() {
 
-		if (resultStr == null || resultStr.isEmpty()) {
+		if (resultBytes == null || resultBytes.length == 0) {
 			exception = new IllegalArgumentException("Empty or null argument");
 			error = true;
 			return this;
 		}
 
 		try {
-			resultStr = new String(ObfuscateClient.unobfuscate(resultStr.getBytes()));
+			resultBytes = ObfuscateClient.unobfuscate(resultBytes);
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Obfuscates(hides) a provided text and encoded the result. The result may be
-	 * obtained using getResult() method.
-	 * 
-	 * @param textToObfuscate to obfuscate. Must not be null nor empty.
-	 * @return this object for chaining.
-	 */
-	public DummyCastle obfuscateWithCoding(String plainText) {
-
-		if (plainText == null || plainText.isEmpty()) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-
-		try {
-			resultStr = new String(Coder.encode(ObfuscateClient.obfuscate(plainText.getBytes())));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Obfuscates(hides) a text provided internally by a previous operation and
-	 * encodes the result. The result may be obtained using getResult() method.
-	 * 
-	 * @return this object for chaining.
-	 */
-	public DummyCastle obfuscateWithCoding() {
-
-		if (resultStr == null || resultStr.isEmpty()) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-
-		try {
-			resultStr = new String(Coder.encode(ObfuscateClient.obfuscate(resultStr.getBytes())));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Decodes and unobfuscates a provided text. The result may be obtained using
-	 * getResult() method.
-	 * 
-	 * @param obfuscatedText to decode and unobfuscate. Must not be null nor empty.
-	 * @return this object for chaining.
-	 */
-	public DummyCastle unobfuscateWithCoding(String obfuscatedText) {
-
-		if (obfuscatedText == null || obfuscatedText.isEmpty()) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-
-		try {
-			resultStr = new String(ObfuscateClient.unobfuscate(Coder.decode(obfuscatedText.getBytes())));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
-		}
-
-		return this;
-	}
-
-	/**
-	 * Decodes and unobfuscates a text provided internally by previous operation.
-	 * The result may be obtained using getResult() method.
-	 * 
-	 * @return this object for chaining.
-	 */
-	public DummyCastle unobfuscateWithCoding() {
-
-		if (resultStr == null || resultStr.isEmpty()) {
-			exception = new IllegalArgumentException("Empty or null argument");
-			error = true;
-			return this;
-		}
-
-		try {
-			resultStr = new String(ObfuscateClient.unobfuscate(Coder.decode(resultStr.getBytes())));
-		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -1060,7 +690,7 @@ public class DummyCastle {
 	 * @param lengthInDigits the size of the result.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle randomNum(int lengthInDigits) {
+	public DummyCastle randomNumWith(int lengthInDigits) {
 
 		if (lengthInDigits < 0) {
 			exception = new IllegalArgumentException("<0 argument");
@@ -1069,11 +699,9 @@ public class DummyCastle {
 		}
 
 		try {
-			resultStr = RandomClient.generateRandomString(lengthInDigits, RandomClient.Mode.NUMERIC, true);
+			resultBytes = RandomClient.generateRandomString(lengthInDigits, RandomClient.Mode.NUMERIC, true).getBytes();
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -1083,10 +711,10 @@ public class DummyCastle {
 	 * Generates a random string. The result may be obtained using getResult()
 	 * method.
 	 * 
-	 * @param lengthInDigits the size of the result.
+	 * @param lengthInChars the size of the result.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle randomStr(int lengthInChars) {
+	public DummyCastle randomStrWith(int lengthInChars) {
 		if (lengthInChars < 0) {
 			exception = new IllegalArgumentException("<0 argument");
 			error = true;
@@ -1094,11 +722,10 @@ public class DummyCastle {
 		}
 
 		try {
-			resultStr = RandomClient.generateRandomString(lengthInChars, RandomClient.Mode.ALPHANUMERIC, true);
+			resultBytes = RandomClient.generateRandomString(lengthInChars, RandomClient.Mode.ALPHANUMERIC, true)
+					.getBytes();
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -1114,7 +741,7 @@ public class DummyCastle {
 	 * @param lengthInDigits the size of the result.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle randomDeterministicNum(String seed, int lengthInDigits) {
+	public DummyCastle randomDeterministicNumWith(String seed, int lengthInDigits) {
 		if (seed == null || seed.isEmpty() || lengthInDigits < 0) {
 			exception = new IllegalArgumentException("<0 argument");
 			error = true;
@@ -1122,12 +749,11 @@ public class DummyCastle {
 		}
 
 		try {
-			resultStr = RandomClient.generateNextDeterministicStr(seed, 0, lengthInDigits, RandomClient.Mode.NUMERIC,
-					true);
+			resultBytes = RandomClient
+					.generateNextDeterministicStr(seed.getBytes(), 0, lengthInDigits, RandomClient.Mode.NUMERIC, true)
+					.getBytes();
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -1143,7 +769,7 @@ public class DummyCastle {
 	 * @param lengthInChars the size of the result.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle randomDeterministicStr(String seed, int lengthInChars) {
+	public DummyCastle randomDeterministicStrWith(String seed, int lengthInChars) {
 
 		if (seed == null || seed.isEmpty() || lengthInChars < 0) {
 			exception = new IllegalArgumentException("Empty or null or <0 argument");
@@ -1152,12 +778,10 @@ public class DummyCastle {
 		}
 
 		try {
-			resultStr = RandomClient.generateNextDeterministicStr(seed, 0, lengthInChars,
-					RandomClient.Mode.ALPHANUMERIC, true);
+			resultBytes = RandomClient.generateNextDeterministicStr(seed.getBytes(), 0, lengthInChars,
+					RandomClient.Mode.ALPHANUMERIC, true).getBytes();
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -1174,7 +798,7 @@ public class DummyCastle {
 	 * @param resPos         starting point of a deterministic result.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle randomDeterministicNumFrom(String seed, int lengthInDigits, int resPos) {
+	public DummyCastle randomDeterministicNumFromWith(String seed, int lengthInDigits, int resPos) {
 		if (seed == null || seed.isEmpty() || lengthInDigits < 0 || resPos < 0) {
 			exception = new IllegalArgumentException("Empty or null or <0 argument");
 			error = true;
@@ -1182,12 +806,10 @@ public class DummyCastle {
 		}
 
 		try {
-			resultStr = RandomClient.generateNextDeterministicStr(seed, resPos, lengthInDigits,
-					RandomClient.Mode.NUMERIC, true);
+			resultBytes = RandomClient.generateNextDeterministicStr(seed.getBytes(), resPos, lengthInDigits,
+					RandomClient.Mode.NUMERIC, true).getBytes();
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
@@ -1199,12 +821,12 @@ public class DummyCastle {
 	 * The result is generated from certain point. The result may be obtained using
 	 * getResult() method.
 	 * 
-	 * @param seed           any kind of string. May not be null nor empty.
-	 * @param lengthInDigits the size of the result.
-	 * @param resPos         starting point of a deterministic result.
+	 * @param seed          any kind of string. May not be null nor empty.
+	 * @param lengthInChars the size of the result.
+	 * @param keyPos        starting point of a deterministic result.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle randomDeterministicStrFrom(String seed, int lengthInChars, int keyPos) {
+	public DummyCastle randomDeterministicStrFromWith(String seed, int lengthInChars, int keyPos) {
 
 		if (seed == null || seed.isEmpty() || lengthInChars < 0 || keyPos < 0) {
 			exception = new IllegalArgumentException("Empty or null or <0 argument");
@@ -1213,12 +835,11 @@ public class DummyCastle {
 		}
 
 		try {
-			resultStr = RandomClient.generateNextDeterministicStr(seed, keyPos, lengthInChars,
-					RandomClient.Mode.ALPHANUMERIC, true);
+			resultBytes = RandomClient.generateNextDeterministicStr(seed.getBytes(), keyPos, lengthInChars,
+					RandomClient.Mode.ALPHANUMERIC, true).getBytes();
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			e.printStackTrace();
+			setUpError(e);
 		}
 
 		return this;
@@ -1231,7 +852,7 @@ public class DummyCastle {
 	 * @param textToShuffle. May not be null nor empty.
 	 * @return this object for chaining.
 	 */
-	public DummyCastle shuffle(String textToShuffle) {
+	public DummyCastle shuffleWith(String textToShuffle) {
 
 		if (textToShuffle == null || textToShuffle.isEmpty()) {
 			exception = new IllegalArgumentException("Empty or null");
@@ -1239,33 +860,225 @@ public class DummyCastle {
 			return this;
 		}
 		try {
-			String permText = new String(PermutClient.shuffle(textToShuffle.getBytes()));
-			resultStr = permText;
+			resultBytes = PermutClient.shuffle(textToShuffle.getBytes());
+
 		} catch (Exception e) {
-			exception = e;
-			error = true;
-			resultStr = "";
+			setUpError(e);
 		}
 
 		return this;
 	}
 
 	/**
-	 * @return results of all operations. The same as toString(). If not operation
-	 *         is executed the result will be an empty string.
+	 * Shuffles randomly characters internally.
+	 * 
+	 * @param seed - key data used to shuffle
+	 * @return
+	 */
+	public DummyCastle shuffle() {
+		if ((resultBytes == null || resultBytes.length == 0)) {
+			exception = new Exception("Empty or null");
+			error = true;
+			return this;
+		}
+		try {
+			resultBytes = PermutClient.shuffle(resultBytes);
+		} catch (Exception e) {
+			setUpError(e);
+		}
+		return this;
+	}
+
+	/**
+	 * Shuffles characters internally based on a provided seed. It always provides
+	 * the same result give the same input data.
+	 * 
+	 * @param seed - key data used to shuffle
+	 * @return
+	 */
+	public DummyCastle shuffleDeterministic(String seed) {
+		if ((resultBytes == null || resultBytes.length == 0) || (seed == null || seed.isEmpty())) {
+			exception = new Exception("Empty or null");
+			error = true;
+			return this;
+		}
+		try {
+			resultBytes = PermutClient.shuffleDeterministic(resultBytes, seed.getBytes());
+		} catch (Exception e) {
+			setUpError(e);
+		}
+		return this;
+	}
+
+	/**
+	 * Shuffles characters in a text based on a provided seed. It always provides
+	 * the same result give the same input data.
+	 * 
+	 * @param textToShuffle - text to shuffle
+	 * @param seed          - key data used to shuffle
+	 * @return
+	 */
+	public DummyCastle shuffleDeterministicWith(String textToShuffle, String seed) {
+		if (textToShuffle == null || textToShuffle.isEmpty() || (seed == null || seed.isEmpty())) {
+			exception = new Exception("Empty or null");
+			error = true;
+			return this;
+		}
+		try {
+			resultBytes = PermutClient.shuffleDeterministic(textToShuffle.getBytes(), seed.getBytes());
+		} catch (Exception e) {
+			setUpError(e);
+		}
+		return this;
+	}
+
+	/**
+	 * @return results of all operations encoded using the default encoding - HEX.
+	 *         The same as toString(). If no operation is executed the result will
+	 *         be an empty string.
 	 */
 	public String getResult() {
-		return resultStr;
+		try {
+			return new String(Coder.encode(resultBytes));
+		} catch (Exception e) {
+			exception = e;
+			error = true;
+		}
+		return "";
+	}
+
+	/**
+	 * Returns unencoded raw string data which is a result of library's operations
+	 * 
+	 * @return unencoded string
+	 */
+	public String getResultDecoded() {
+		try {
+			return new String(resultBytes);
+		} catch (Exception e) {
+			exception = e;
+			error = true;
+		}
+		return "";
+	}
+
+	/**
+	 * Returns unencoded raw byte data which is a result of library's operations
+	 * 
+	 * @return unencoded bytes
+	 */
+	byte[] getResultDecodedRaw() {
+		try {
+			return resultBytes;
+		} catch (Exception e) {
+			exception = e;
+			error = true;
+		}
+		return new byte[0];
+	}
+
+	/**
+	 * Inserts unencoded raw string data to work on it.
+	 * 
+	 * @param plainText - unencoded plain data as string.
+	 * 
+	 * @return this object
+	 */
+	public DummyCastle fromStringDecoded(String plainText) {
+		if ((plainText == null) || plainText.isEmpty()) {
+			exception = new Exception("Empty or null argument");
+			error = true;
+			return this;
+		}
+		try {
+			resultBytes = plainText.getBytes();
+		} catch (Exception e) {
+			setUpError(e);
+		}
+		return this;
+	}
+
+	/**
+	 * Inserts unencoded raw byte data to work on it.
+	 * 
+	 * @param plainText - unencoded plain byte data.
+	 * 
+	 * @return this object
+	 */
+	DummyCastle fromBytesDecoded(byte[] plainText) {
+		if ((plainText == null) || plainText.length == 0) {
+			exception = new Exception("Empty or null argument");
+			error = true;
+			return this;
+		}
+		try {
+			resultBytes = plainText;
+		} catch (Exception e) {
+			setUpError(e);
+		}
+		return this;
+	}
+
+	/**
+	 * Inserts encoded with the library's default encoding string data to work on
+	 * it.
+	 * 
+	 * @param encodedText - unencoded plain data as string.
+	 * 
+	 * @return this object
+	 */
+	DummyCastle fromStringEncoded(String encodedText) {
+		if ((encodedText == null) || encodedText.isEmpty()) {
+			exception = new Exception("Empty or null argument");
+			error = true;
+			return this;
+		}
+		try {
+			resultBytes = Coder.decode(encodedText.getBytes());
+		} catch (Exception e) {
+			setUpError(e);
+		}
+		return this;
+	}
+
+	/**
+	 * Inserts encoded with the library's default encoding byte data to work on it.
+	 * 
+	 * @param encodedText - encoded data.
+	 * 
+	 * @return this object
+	 */
+	DummyCastle fromBytesEncoded(byte[] encodedText) {
+		if ((encodedText == null) || encodedText.length == 0) {
+			exception = new Exception("Empty or null argument");
+			error = true;
+			return this;
+		}
+		try {
+			resultBytes = encodedText;
+		} catch (Exception e) {
+			setUpError(e);
+		}
+		return this;
 	}
 
 	/**
 	 *
-	 * @return results of all operations. The same as toString(). If not operation
-	 *         is executed the result will be an empty string. The same as
-	 *         getResult()
+	 * @return results of all operations. Encoded with default encoding method -
+	 *         HEX. The same as toString(). If not operation is executed the result
+	 *         will be an empty string. The same as getResult()
 	 */
 	public String toString() {
 		return getResult();
+	}
+
+	/**
+	 * Returns unencoded data being as a string. It is a result of all operations.
+	 * 
+	 * @return raw unencoded data.
+	 */
+	public String toStringDecoded() {
+		return getResultDecoded();
 	}
 
 	/**
@@ -1273,9 +1086,10 @@ public class DummyCastle {
 	 * 
 	 */
 	public void reset() {
-		resultStr = "";
+		resultBytes = new byte[0];
 		error = false;
 		exception = new Exception();
+		cryptSymmKey = new CryptSymmKey();
 	}
 
 	/**
@@ -1291,6 +1105,16 @@ public class DummyCastle {
 	 */
 	public Exception getException() {
 		return exception;
+	}
+
+	/**
+	 * Prepares exception
+	 * @param e exception to setup
+	 */
+	private void setUpError(Exception e) {
+		exception = e;
+		error = true;
+		resultBytes = new byte[0];
 	}
 
 }

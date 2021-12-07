@@ -34,7 +34,6 @@ public class RandomClient {
 			char ch = characters.charAt((int) index);
 			if (nonleadzero && ch == '0') {
 				index = generateNextRandomInt(charactersLength - 1);
-				ch = characters.charAt((int) index);
 			}
 			buffer.append(characters.charAt((int) index));
 		}
@@ -73,22 +72,14 @@ public class RandomClient {
 
 	}
 
-	public static String generateNextDeterministicStr(String salt, int posStart, int length, Mode mode,
+	public static String generateNextDeterministicStr(byte[] salt, int posStart, int length, Mode mode,
 			boolean nonleadzero) {
-		byte[] ibuf = salt.getBytes();
+		byte[] ibuf = salt;
 		int iLen = ibuf.length;
 		//
 		byte seed = 0;
 		for (int i = 0; i < iLen; i++)
 			seed = (byte) (seed ^ ibuf[i]);
-
-		/*
-		 * // Modulus parameter int mod = 7; // Multiplier term int multiplier = 3; //
-		 * Increment term int inc = 3; // Number of Random numbers // to be generated
-		 * int noOfRandomNum = length; // To store random numbers int[] randomNums = new
-		 * int[noOfRandomNum]; // Function Call lcm(seed, mod, multiplier, inc,
-		 * randomNums, noOfRandomNum);
-		 */
 
 		StringBuffer buffer = new StringBuffer();
 		String characters = "";
@@ -111,18 +102,16 @@ public class RandomClient {
 
 		int charactersLength = characters.length();
 		for (int i = 0; i < length; i++) {
-			int index = (salt.charAt((posStart + i) % salt.length()) ^ (seed + (posStart + i))) % charactersLength;
+			int index = ((salt[(posStart + i) % salt.length] ^ (seed + (posStart + i))) % charactersLength);
 
-		 
 			char ch = characters.charAt((int) index);
 			if (nonleadzero && ch == '0') {
-				index = (salt.charAt((posStart + i) % salt.length()) ^ (seed * (posStart + i)))
-						% (charactersLength - 1);
+				index = (salt[(posStart + i) % salt.length] ^ (seed * (posStart + i))) % (charactersLength - 1);
 				ch = characters.charAt((int) index);
 			}
 			buffer.append(characters.charAt((int) index));
 		}
-	 
+
 		return buffer.toString();
 	}
 

@@ -82,7 +82,7 @@ public class CryptSymmKey {
 	 * Returns the key of the specified length.
 	 * 
 	 * @param len the length of resulting string.
-	 * @return
+	 * @return the key
 	 */
 	public String toString(int len) {
 		if (len < 0)
@@ -103,7 +103,7 @@ public class CryptSymmKey {
 	}
 
 	/**
-	 * @return
+	 * @return the key size
 	 */
 	public int getKeySize() {
 		return keySize;

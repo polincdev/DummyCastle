@@ -1,28 +1,26 @@
 package pl.polinc.dummycastle.crypt.asymm;
 
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 
+import pl.polinc.dummycastle.coding.Coder;
+import pl.polinc.dummycastle.coding.Hex;
 import pl.polinc.dummycastle.crypt.symm.CryptSymmKey;
 import pl.polinc.dummycastle.random.RandomClient;
 
 public class CryptAsymm {
 
-	public static BigInteger privateKey;
-	public static BigInteger publicKey;
-	public static BigInteger modulus;
-	public static String cryptKey;
-
 	// Encrypt
 	public static byte[] encryptStream(byte[] plainData, CryptAsymmKey key) {
 
+		int keySize = key.getKeySize() / 8;
+		if (keySize > plainData.length)
+			keySize = plainData.length;
 		// prepare
-		String symmKey = RandomClient.generateRandomString(key.getKeySize() / 8, RandomClient.Mode.ALPHANUMERIC, false);
-		// String symmKey= RandomClient.generateRandomString( 8,
-		// RandomClient.Mode.ALPHANUMERIC, false);
+		String symmKey = RandomClient.generateRandomString(keySize, RandomClient.Mode.ALPHANUMERIC, false);
 		BigInteger gemStr = new BigInteger(symmKey.getBytes());
 		BigInteger enc = gemStr.modPow(key.getExponent(), key.getProduct());
 		byte[] gem = enc.toString().getBytes();
-
 		//
 		CryptAsymmClient cryptClient = new CryptAsymmClient(new CryptSymmKey(symmKey));
 		//
@@ -33,7 +31,6 @@ public class CryptAsymm {
 		for (int a = 0; a < 4; a++)
 			encryptedDataWithGem[a] = gemLenBytes[a];
 
-	 
 		for (int a = 0; a < gemLen; a++)
 			encryptedDataWithGem[a + 4] = gem[a];
 
@@ -56,16 +53,16 @@ public class CryptAsymm {
 		for (int a = 0; a < gemLen; a++)
 			gemEnc[a] = encryptedDataWithGem[a + 4];
 		BigInteger gemStr = new BigInteger(new String(gemEnc));
-		; // DOnt use (byte[]) constructor nor toBytes method. It is wrong
 
+		// DOnt use (byte[]) constructor nor toBytes method. It is wrong
 		BigInteger enc = gemStr.modPow(key.getExponent(), key.getProduct());
 		byte[] gem = enc.toByteArray();
 		String symmKey = new String(gem);
+
 		byte[] encryptedData = new byte[encryptedDataWithGem.length - (gemLen + 4)];
 		for (int a = 0; a < encryptedData.length; a++)
 			encryptedData[a] = encryptedDataWithGem[gemLen + 4 + a];
 		//
-
 		CryptAsymmClient cryptClient = new CryptAsymmClient(new CryptSymmKey(symmKey));
 		byte[] plainData = cryptClient.decrypt(encryptedData);
 

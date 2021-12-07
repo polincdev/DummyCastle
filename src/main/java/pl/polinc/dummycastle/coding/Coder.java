@@ -49,4 +49,8 @@ public class Coder {
 	static public byte[] decodeHex(byte[] plainText) {
 		return Hex.decode(plainText);
 	}
+
+	public static byte[] decodeString2Bytes(String plainText) {
+		return Hex.decode(plainText);
+	}
 }

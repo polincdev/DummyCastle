@@ -11,9 +11,9 @@ public class HasherClient {
 	byte[] keyBytes;
 	int keySize = 0;
 
-	static public String hash(String textInput, int outputLen) {
-		int iLen = textInput.length();
-		byte[] ibuf = textInput.getBytes();
+	static public byte[] hash(byte[] textInput, int outputLen) {
+		int iLen = textInput.length;
+		byte[] ibuf = textInput;
 		byte[] obuf = new byte[outputLen];
 		byte[] salt = new byte[outputLen];
 		byte[] pass = new byte[outputLen];
@@ -30,8 +30,9 @@ public class HasherClient {
 		}
 
 		HasherClient.hash(pass, ibuf, obuf, iLen, outputLen, salt);
+
 		//
-		return new String(obuf);
+		return obuf;
 	}
 
 	public static int hash(byte[] pass, byte[] ibuf, byte[] obuf, int ilen, int olen, byte[] salt) {

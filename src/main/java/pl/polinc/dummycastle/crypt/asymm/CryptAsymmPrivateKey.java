@@ -28,7 +28,7 @@ public class CryptAsymmPrivateKey implements CryptAsymmKey {
 	 * 
 	 * @param d an exponent of the key.
 	 * @param n a product of the key.
-	 * @return
+	 * @return the key
 	 */
 	static public CryptAsymmPrivateKey createFromNums(BigInteger d, BigInteger n) {
 		return new CryptAsymmPrivateKey(d, n);
@@ -39,7 +39,7 @@ public class CryptAsymmPrivateKey implements CryptAsymmKey {
 	 * 
 	 * @param privateKeyNumberData an exponent and a product of the key represented
 	 *                             as one string.
-	 * @return
+	 * @return the key
 	 */
 	static public CryptAsymmPrivateKey createFromString(String privateKeyNumberData) {
 		String[] data = privateKeyNumberData.split(KEY_SEPARATOR);
