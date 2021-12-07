@@ -872,8 +872,7 @@ public class DummyCastle {
 	/**
 	 * Shuffles randomly characters internally.
 	 * 
-	 * @param seed - key data used to shuffle
-	 * @return
+     * @return this object
 	 */
 	public DummyCastle shuffle() {
 		if ((resultBytes == null || resultBytes.length == 0)) {
@@ -894,7 +893,7 @@ public class DummyCastle {
 	 * the same result give the same input data.
 	 * 
 	 * @param seed - key data used to shuffle
-	 * @return
+	 * @return this object
 	 */
 	public DummyCastle shuffleDeterministic(String seed) {
 		if ((resultBytes == null || resultBytes.length == 0) || (seed == null || seed.isEmpty())) {
@@ -916,7 +915,7 @@ public class DummyCastle {
 	 * 
 	 * @param textToShuffle - text to shuffle
 	 * @param seed          - key data used to shuffle
-	 * @return
+	 * @return this object
 	 */
 	public DummyCastle shuffleDeterministicWith(String textToShuffle, String seed) {
 		if (textToShuffle == null || textToShuffle.isEmpty() || (seed == null || seed.isEmpty())) {
