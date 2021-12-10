@@ -1,6 +1,6 @@
 # DummyCastle - Cryptography for dummies.
   
-<img align="center" src="https://github.com/polincdev/DummyCastle/blob/master/img/dummycastle.png" data-canonical-src="https://github.com/polincdev/DummyCastle/blob/master/img/dummycastle.png" width="200" height="100" />
+<img align="middle" src="https://github.com/polincdev/DummyCastle/blob/master/img/dummycastle.png" data-canonical-src="https://github.com/polincdev/DummyCastle/blob/master/img/dummycastle.png" width="200" height="150" />
 ## What is DummyCastle?
 
 It's a quick and simple solution for developers who want to apply any level of security to their applications and they are not
