@@ -2,6 +2,7 @@
 
 ![DummyCastle](../master/img/dummycastle.png)
 
+<img src="https://github.com/polincdev/DummyCastle/blob/master/img/dummycastle.png" data-canonical-src="https://github.com/polincdev/DummyCastle/blob/master/img/dummycastle.png" width="200" height="400" />
 ## What is DummyCastle?
 
 It's a quick and simple solution for developers who want to apply any level of security to their applications and they are not
