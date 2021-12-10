@@ -1,6 +1,6 @@
 # DummyCastle - Cryptography for dummies.
 
-![DummyCastle](../master/img/DummyCastle.png)
+![DummyCastle](../master/img/dummycastle.png)
 
 ## What is DummyCastle?
 
