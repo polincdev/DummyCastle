@@ -74,11 +74,21 @@ The raw output might be retrieved as a string using getResultDecoded() or as an 
 String randomIntPlain = dummyCastle.randomNumWith(8).getResultDecoded();
 ```
 
-Alternatively, you may use method fromStringEncoded() which accept encoded text and decode it using getResultDecoded().
+Alternatively, you may use method fromStringEncoded() which accept encoded text and decode it using getResultDecoded():
 
 ```java
-String randomIntPlain = dummyCastle.fromStringEncoded(decrypted).getResultDecoded();
+String plainText = dummyCastle.fromStringEncoded(decrypted).getResultDecoded();
 ```
+
+of using decodeWith() method
+
+```java
+String plainText=dummyCastle.decodeWith(decrypted).toStringDecoded();
+```
+
+### Error handling
+
+
 
 ## Usage
 
@@ -105,17 +115,22 @@ byte[] encryptedDecoded = dummyCastle.getResultDecodedRaw();
 
 //Decryption in general should be carried out using the HEX encoded string. The resulting plain text is still HEX decoded.
  String decrypted = dummyCastle.decryptSymmWith(encrypted).getResult();
- //The input for decryption may be provided through a separate method
+ //The input for decryption may be provided through a separate method.
  dummyCastle.fromStringEncoded(encrypted);
- //Now you can decode the data as they are kept inside 
+ //Now you can decode the data as they are kept inside. 
 String decrypted = dummyCastle.decryptSymm().getResult();
- 
- 
+
  
 ```
 
-//Asymmetric encryption
+### Asymmetric encryption
 
+Public-key cryptography or asymmetric cryptography, is a cryptographic system that uses pairs of keys. 
+Each pair consists of a public key (which may be known to others) and a private key (which may not be known by anyone except the owner). 
+The generation of such key pairs depends on cryptographic algorithms which are based on mathematical problems termed one-way functions. 
+Effective security requires keeping the private key private; the public key can be openly distributed without compromising security.
+
+Basic
 ```java
 CryptAsymmKeysPair cryptAsymmKeysPair = dummyCastle.genAsymmKeys();
 CryptAsymmPublicKey cryptAsymmPublicKey = cryptAsymmKeysPair.getCryptAsymmPublicKey();
@@ -126,6 +141,19 @@ String decrypted = dummyCastle.decryptAsymmWith( encrypted , cryptAsymmPrivateKe
 String decodedResult=dummyCastle.decodeWith(decrypted).toStringDecoded();
 ```
 
+Advanced
+```java
+//Generate key pair
+CryptAsymmKeysPair cryptAsymmKeysPair = dummyCastle.genAsymmKeys();
+//Retrieve private key for decrypting
+
+        CryptAsymmPublicKey cryptAsymmPublicKey = cryptAsymmKeysPair.getCryptAsymmPublicKey();
+
+        CryptAsymmPrivateKey cryptAsymmPrivateKey = cryptAsymmKeysPair.getCryptAsymmPrivateKey();
+
+cryptAsymmPrivateKey = dummyCastle.genAsymmPrivateKeyWith(priv);
+
+```
 //Random generation
 
 ```java
