@@ -40,6 +40,8 @@ One simple object is enough to handle all the operations and methods.
 ```java
 import pl.polinc.dummycastle.DummyCastle;
  
+### The clss
+
 DummyCastle dummyCastle = new DummyCastle();
  
 String password="Password";
@@ -47,14 +49,69 @@ dummyCastle.genSymmKeyWith(password);
 String encrypted = dummyCastle.encryptSymmWith(plainText).getResult();
 ```
 
+The DummyCastle class is designed to be a container for a value which is being operated on.
+That's why as a rule of thumb a new object should be created for every value which you want to encrypt or carry out any other operation on it.
+It is not thread safe in any way. Object's memory footprint is very small thou. Most of methods are static, so the only memory weight is a result of the very value. 
+In order to help working on a value, the method chaining is possible. For example if you want do generate a random value and encrypt it, you can do it with one line of code:
+
+```java
+String randomInt = dummyCastle.randomNumWith(8).encryptSymm().getResult();
+```
+
+### Encoding
+
+DummyCastle keeps the processed value as an array of bytes. It may be retrieved from the object using couple of methods.
+In general the output form the library is encoded using HEX encoding. The reason behind it is to prevent any platform specific problems related to encoding. 
+The result might be retrieved using getResult() or toString() methods. 
+
+```java
+String randomIntDecoded = dummyCastle.randomNumWith(8).getResult();
+```
+
+The raw output might be retrieved as a string using getResultDecoded() or as an array of bytes using getResultDecodedRaw().
+
+```java
+String randomIntPlain = dummyCastle.randomNumWith(8).getResultDecoded();
+```
+
+Alternatively, you may use method fromStringEncoded() which accept encoded text and decode it using getResultDecoded().
+
+```java
+String randomIntPlain = dummyCastle.fromStringEncoded(decrypted).getResultDecoded();
+```
+
 ## Usage
 
-//Symmetric encryption
+### Symmetric encryption
 
+Symmetric encryption is a type of encryption where only one key (a secret key) is used to both encrypt and decrypt electronic information. 
+The requirement that both parties have access to the secret key is one of the main drawbacks of symmetric-key encryption, in comparison to public-key encryption (also known as asymmetric-key encryption).
+
+Basic
 ```java
 String encrypted = dummyCastle.encryptSymmWith(plainText).getResult();
 String decrypted = dummyCastle.decryptSymmWith(encrypted).getResult();
 String decodedResult = dummyCastle.decodeWith(decrypted).toStringDecoded();
+```
+Advanced
+```java
+//Prepare key
+String password="Password";
+dummyCastle.genSymmKeyWith(password);
+//Encrypt and get the result as a safe HEX encoded string
+String encrypted = dummyCastle.encryptSymmWith(plainText).getResult();
+//If a raw encrypted bytes are required you mey get it from the same object
+byte[] encryptedDecoded = dummyCastle.getResultDecodedRaw();
+
+//Decryption in general should be carried out using the HEX encoded string. The resulting plain text is still HEX decoded.
+ String decrypted = dummyCastle.decryptSymmWith(encrypted).getResult();
+ //The input for decryption may be provided through a separate method
+ dummyCastle.fromStringEncoded(encrypted);
+ //Now you can decode the data as they are kept inside 
+String decrypted = dummyCastle.decryptSymm().getResult();
+ 
+ 
+ 
 ```
 
 //Asymmetric encryption
@@ -109,7 +166,7 @@ dummyCastle.reset();
 This library is an official port fo Java version which can be found here:
 https://github.com/polincdev/DummyCastle
 
-The java/FLutter versio is available here:
+The java/FLutter version is available here:
 https://github.com/polincdev/DummyCastle4java
 
 The versions remain synced.
