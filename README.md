@@ -189,12 +189,22 @@ String hashed2 = dummyCastle.hashToStr().getResult();
 ```
  
 
-//Shuffling
+### Shuffling
 
+Shuffling arranges bytes in a random or deterministic order. 
+The deterministic shuffling needs a seed data which will put the data in the same order every time it gets called. 
+  
+Simple
 ```java
 String someRand1="aAbBcC";
 String shuffled1 = dummyCastle.shuffleWith(plainText).getResultDecoded();
 String shuffled2 = dummyCastle.shuffleDeterministicWith(plainText, someRand1).getResultDecoded();
+```
+
+Advanced
+```java
+dummyCastle.fromStringDecoded(plainText);
+String shuffled1 = dummyCastle.shuffle().getResultDecoded();
 ```
 
 //Obfuscation
