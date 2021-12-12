@@ -146,12 +146,17 @@ CryptAsymmKeysPair cryptAsymmKeysPair = dummyCastle.genAsymmKeys();
 //Retrieve private key for decrypting
 CryptAsymmPrivateKey cryptAsymmPrivateKey = cryptAsymmKeysPair.getCryptAsymmPrivateKey();
 //Retrieve public key  
-// CryptAsymmPublicKey cryptAsymmPublicKey = cryptAsymmKeysPair.getCryptAsymmPublicKey();
-
-
-cryptAsymmPrivateKey = dummyCastle.genAsymmPrivateKeyWith(priv);
-
+ CryptAsymmPublicKey cryptAsymmPublicKey = cryptAsymmKeysPair.getCryptAsymmPublicKey();
+//Turn the key into string for publishing and publish it somewhere on the web
+String pub = cryptAsymmPublicKey.toString();
+//Encrypt with thepublic key
+encrypted = dummyCastle.encryptAsymmWith(plainText, cryptAsymmPublicKey).getResult();
+//Get published key from the web and turn it into an object
+cryptAsymmPrivateKey = dummyCastle.genAsymmPublicKeyWith(pub);
+//Decrypt data using the private key
+decrypted = dummyCastle.decryptAsymmWith(encrypted, cryptAsymmPrivateKey).getResult();
 ```
+
 //Random generation
 
 ```java
@@ -160,12 +165,29 @@ String randomStr1 = dummyCastle.randomStrWith(8).getResultDecoded();
 String randomInt2 = dummyCastle.randomDeterministicNumWith(someRand1, 8).getResult();
 ```
 
-//Hashing
+### Hashing
 
+Hashing maps data of any length into a fixed/determined length hash value. 
+The library enables youto hash into a numeric(long) or string(alphanumeric) value.
+Both are always represented as strings, the numeric hash value can be parsed into a long though. 
+The default length of alphanumeric value is 8. Don't forget the result is always HEX encoded.
+
+Basic
 ```java
 String hashed1  = dummyCastle.hashToNumWith(plainText1).getResult();
 String hashed2  = dummyCastle.hashToStrWith(plainText1).getResult();
 ```
+
+Advanced
+```java
+//Hash data provided externally
+String hashed1 = dummyCastle.hashToStrWith(plainText1).getResult();
+//Provide data from an external source
+String dummyCastle.fromStringDecoded(plainText1);
+//Hash the data internally
+String hashed2 = dummyCastle.hashToStr().getResult();
+```
+ 
 
 //Shuffling
 
