@@ -119,8 +119,6 @@ byte[] encryptedDecoded = dummyCastle.getResultDecodedRaw();
  dummyCastle.fromStringEncoded(encrypted);
  //Now you can decode the data as they are kept inside. 
 String decrypted = dummyCastle.decryptSymm().getResult();
-
- 
 ```
 
 ### Asymmetric encryption
@@ -146,10 +144,10 @@ Advanced
 //Generate key pair
 CryptAsymmKeysPair cryptAsymmKeysPair = dummyCastle.genAsymmKeys();
 //Retrieve private key for decrypting
+CryptAsymmPrivateKey cryptAsymmPrivateKey = cryptAsymmKeysPair.getCryptAsymmPrivateKey();
+//Retrieve public key  
+// CryptAsymmPublicKey cryptAsymmPublicKey = cryptAsymmKeysPair.getCryptAsymmPublicKey();
 
-        CryptAsymmPublicKey cryptAsymmPublicKey = cryptAsymmKeysPair.getCryptAsymmPublicKey();
-
-        CryptAsymmPrivateKey cryptAsymmPrivateKey = cryptAsymmKeysPair.getCryptAsymmPrivateKey();
 
 cryptAsymmPrivateKey = dummyCastle.genAsymmPrivateKeyWith(priv);
 
@@ -191,10 +189,10 @@ dummyCastle.reset();
 
 ## Additional information
 
-This library is an official port fo Java version which can be found here:
+This library has an official port fo Dart/Flutter version which can be found here:
 https://github.com/polincdev/DummyCastle
 
-The java/FLutter version is available here:
-https://github.com/polincdev/DummyCastle4java
+The Dart/FLutter version is available here:
+https://github.com/polincdev/DummyCastle4Dart
 
 The versions remain synced.
