@@ -4,11 +4,11 @@
 
 ## What is DummyCastle?
 
-It's a quick and simple solution for developers who want to apply any level of security to their applications and they are not
+It's a quick and simple solution for Java and Dart developers who want to apply any level of security to their applications and they are not
 interested in learning to use available libraries.
 
 ## Who is this solution for?
-DummyCastle should be used wherever there is a need to protect information that is not essential. For example, to protect:
+DummyCastle should be used whenever there is a need to protect information that is not essential. For example, to protect:
 - API keys
 - chats
 - messages
@@ -33,6 +33,8 @@ The library provides the following features:
 - shuffling
 - obfuscation
 
+Everything is preconfigured and there is no need to have any kind knowledge about cryptography other than this short manual  
+
 ## Getting started
 
 One simple object is enough to handle all the operations and methods.
@@ -48,37 +50,37 @@ String encrypted = dummyCastle.encryptSymmWith(plainText).getResult();
 ```
 
 The DummyCastle class is designed to be a container for a value which is being operated on.
-That's why as a rule of thumb a new object should be created for every value which you want to encrypt or carry out any other operation on it.
-It is not thread safe in any way. Object's memory footprint is very small thou. Most of methods are static, so the only memory weight is a result of the very value. 
-In order to help working on a value, the method chaining is possible. For example if you want do generate a random value and encrypt it, you can do it with one line of code:
+That's why as a rule of thumb, a new object should be created for every value which you want to encrypt or carry out any other operation.
+It is not thread safe in any way. Object's memory footprint is very small though. Most of the methods are static, so the only memory weight is a result of the processed value. 
+In order to help to work on a value, the method chaining is possible. For example if you want to generate a random value and encrypt it, you can do it with only one line of code:
 
 ```java
-String randomInt = dummyCastle.randomNumWith(8).encryptSymm().getResult();
+String randomInt = dummyCastle.randomNumWith(8).genSymmKeyWith("Password").encryptSymm().getResult();
 ```
 
 ### Encoding
 
 DummyCastle keeps the processed value as an array of bytes. It may be retrieved from the object using couple of methods.
-In general the output form the library is encoded using HEX encoding. The reason behind it is to prevent any platform specific problems related to encoding. 
+In general the output from the library is encoded using HEX encoding. The reason behind it is to prevent any platform specific problems related to encoding. 
 The result might be retrieved using getResult() or toString() methods. 
 
 ```java
 String randomIntDecoded = dummyCastle.randomNumWith(8).getResult();
 ```
 
-The raw output might be retrieved as a string using getResultDecoded() or as an array of bytes using getResultDecodedRaw().
+The raw output might be retrieved as a string using getResultDecoded() or as an array of bytes using getResultDecodedRaw():
 
 ```java
 String randomIntPlain = dummyCastle.randomNumWith(8).getResultDecoded();
 ```
 
-Alternatively, you may use method fromStringEncoded() which accept encoded text and decode it using getResultDecoded():
+Alternatively, you may use the method fromStringEncoded() which accept encoded text and then decode it using getResultDecoded():
 
 ```java
 String plainText = dummyCastle.fromStringEncoded(decrypted).getResultDecoded();
 ```
 
-of using decodeWith() method
+of using decodeWith() method:
 
 ```java
 String plainText=dummyCastle.decodeWith(decrypted).toStringDecoded();
@@ -86,13 +88,13 @@ String plainText=dummyCastle.decodeWith(decrypted).toStringDecoded();
 
 ### Error handling
 
-The library tries to be as unobtrusive as possible that's why it handles all its exceptions internally. 
-Thanks to that there is no risk of NullPointerException, but at the cost of verbosity of error handling. 
+The library tries to be as unobtrusive as possible, that's why it handles all its exceptions internally. 
+Thanks to that there is no risk of NullPointerException, but it is attained at the cost of verbosity of error handling. 
 So if the exception occurs the value gets purged and limited to an empty string, but not nullified.
 In order to detect causes of potential errors two methods are provided: isError() and getException().
 The isError() method, as one may suspect, returns boolean value which indicate that at any point of calling methods of the library an exceptions has been thrown.
 This means that errors don't get reset by next operations. This poses a risk of calling chained methods which in sequence may work of erratic value.
-The second method returns the actual exceptions which may be used to retrieve informations concerning the issue. 
+The second method returns the actual exceptions which may be used to retrieve information concerning the issue. 
 
 ```java
 //Any kind of operations. We assume it will throw an internal exception.
@@ -123,14 +125,14 @@ String password="Password";
 dummyCastle.genSymmKeyWith(password);
 //Encrypt and get the result as a safe HEX encoded string
 String encrypted = dummyCastle.encryptSymmWith(plainText).getResult();
-//If a raw encrypted bytes are required you mey get it from the same object
+//If a raw encrypted bytes are required you may get it from the same object
 byte[] encryptedDecoded = dummyCastle.getResultDecodedRaw();
 
 //Decryption in general should be carried out using the HEX encoded string. The resulting plain text is still HEX decoded.
  String decrypted = dummyCastle.decryptSymmWith(encrypted).getResult();
  //The input for decryption may be provided through a separate method.
  dummyCastle.fromStringEncoded(encrypted);
- //Now you can decode the data as they are kept inside. 
+ //Now you can decrypt the data as they are kept inside. 
 String decrypted = dummyCastle.decryptSymm().getResult();
 ```
 
@@ -139,7 +141,7 @@ String decrypted = dummyCastle.decryptSymm().getResult();
 Public-key cryptography or asymmetric cryptography, is a cryptographic system that uses pairs of keys. 
 Each pair consists of a public key (which may be known to others) and a private key (which may not be known by anyone except the owner). 
 The generation of such key pairs depends on cryptographic algorithms which are based on mathematical problems termed one-way functions. 
-Effective security requires keeping the private key private; the public key can be openly distributed without compromising security.
+Effective security requires keeping the private key private. The public key can be openly distributed without compromising security.
 
 Basic
 ```java
@@ -154,15 +156,15 @@ String decodedResult=dummyCastle.decodeWith(decrypted).toStringDecoded();
 
 Advanced
 ```java
-//Generate key pair
+//Generate a key pair
 CryptAsymmKeysPair cryptAsymmKeysPair = dummyCastle.genAsymmKeys();
 //Retrieve private key for decrypting
 CryptAsymmPrivateKey cryptAsymmPrivateKey = cryptAsymmKeysPair.getCryptAsymmPrivateKey();
-//Retrieve public key  
+//Retrieve the public key  
  CryptAsymmPublicKey cryptAsymmPublicKey = cryptAsymmKeysPair.getCryptAsymmPublicKey();
-//Turn the key into string for publishing and publish it somewhere on the web
+//Turn the key into a string for publishing and publish it somewhere on the web
 String pub = cryptAsymmPublicKey.toString();
-//Encrypt with thepublic key
+//Encrypt with the public key
 encrypted = dummyCastle.encryptAsymmWith(plainText, cryptAsymmPublicKey).getResult();
 //Get published key from the web and turn it into an object
 cryptAsymmPrivateKey = dummyCastle.genAsymmPublicKeyWith(pub);
@@ -172,6 +174,9 @@ decrypted = dummyCastle.decryptAsymmWith(encrypted, cryptAsymmPrivateKey).getRes
 
 ### Random generation
 
+DummyCastle makes it possible to generate random numeric and alphanumeric values.
+Both are always represented as strings, the numeric value can be parsed into a long though. The result is always HEX encoded.
+
 Basic
 ```java
 String randomInt1 = dummyCastle.randomNumWith(8).getResultDecoded();
@@ -179,9 +184,9 @@ String randomStr1 = dummyCastle.randomStrWith(8).getResultDecoded();
 String randomInt2 = dummyCastle.randomDeterministicNumWith(someRand1, 8).getResult();
 ```
 
-Basic
+Advanced
 ```java
-//Generates 6 characters in a deterministic manner but start the generation from the '2' character.
+//Generates 6 characters in a deterministic manner but starts the generation from the '2' character.
 //This method is a counterpart of substring method but without generating the whole 8 characters.
 randomStr2 = dummyCastle.randomDeterministicStrFromWith(someRand1, 6, 2).getResult();
 ```
@@ -189,9 +194,9 @@ randomStr2 = dummyCastle.randomDeterministicStrFromWith(someRand1, 6, 2).getResu
 ### Hashing
 
 Hashing maps data of any length into a fixed/determined length hash value. 
-The library enables youto hash into a numeric(long) or string(alphanumeric) value.
+The library enables you to hash into a numeric(long) or string(alphanumeric) value.
 Both are always represented as strings, the numeric hash value can be parsed into a long though. 
-The default length of alphanumeric value is 8. Don't forget the result is always HEX encoded.
+The default length of alphanumeric value is 8. The result is always HEX encoded.
 
 Basic
 ```java
@@ -229,7 +234,7 @@ String shuffled1 = dummyCastle.shuffle().getResultDecoded();
 
 ### Obfuscation
 
-Obfuscation is the process of creating data that is difficult to decompile, read and understand in order to protect intellectual property or trade secrets, and to prevent an attacker from reverse engineering a proprietary software program.
+Obfuscation is the process of creating data that is difficult to decompile, read and understand in order to protect intellectual property or other secrets, and to prevent an attacker from reverse engineering a proprietary software program.
 
 Simple
 ```java
@@ -247,7 +252,7 @@ String unobfuscated = dummyCastle.unobfuscateWith(obfuscated).getResultDecoded()
  
 ##Clean up - optional
 
-The cleaning up is not required. What it does is resetting the main value to an empty string, setting the error flag to false and resetting the excetion.
+The cleaning up is not required. What it does is resetting the main value to an empty string, setting the error flag to false and resetting the exception.
 
 ```java
 dummyCastle.reset();
@@ -255,12 +260,11 @@ dummyCastle.reset();
 
 ## Test
 
-The below tests were prepared without use of any kind of testing framework in order to make them compatible between Java and Dart. 
+The below tests were prepared without a use of any kind of testing framework in order to make them Java and Dart versions compatible. 
 
-Given the following variables:
+Given the following global variables:
 
 ```java
-
 String password = "Password";
 String plainText = "TestPlainText";
 String plainText1 = "TestPlainText1";
@@ -283,7 +287,7 @@ String randomStr2 = "";
 boolean verbose = true;
 ```
 
-and main library object:
+and the main library object:
 
 ```java
 DummyCastle dummyCastle = new DummyCastle();
@@ -396,7 +400,7 @@ decrypted = dummyCastle.decryptAsymmWith(encrypted, cryptAsymmPrivateKey).getRes
 if (verbose)
 System.out.println("Test: Asymmetric decryption=" + decrypted + getOpErrorStatus(dummyCastle));
 decodedResult = dummyCastle.decodeWith(decrypted).toStringDecoded();
-;
+ 
 System.out.println("Test: Asymmetric descryption from source result="
 + (decodedResult.equals(plainText) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
 
