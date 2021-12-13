@@ -260,28 +260,27 @@ The below tests were prepared without use of any kind of testing framework in or
 Given the following variables:
 
 ```java
-// Vars
-	String password = "Password";
-	String plainText = "TestPlainText";
-	String plainText1 = "TestPlainText1";
-	String plainText2 = "TestPlainText2";
-	String encrypted = "";
-	String decrypted = "";
-	String hashed1 = "";
-	String hashed2 = "";
-	String decodedResult = "";
-	String someRand1 = "aAbBcC";
-	String someRand2 = "xXyYzZ";
-	String obfuscated = "";
-	String unobfuscated = "";
-	String shuffled1 = "";
-	String shuffled2 = "";
-	String randomInt1 = "";
-	String randomInt2 = "";
-	String randomStr1 = "";
-	String randomStr2 = "";
-	boolean verbose = true;
 
+String password = "Password";
+String plainText = "TestPlainText";
+String plainText1 = "TestPlainText1";
+String plainText2 = "TestPlainText2";
+String encrypted = "";
+String decrypted = "";
+String hashed1 = "";
+String hashed2 = "";
+String decodedResult = "";
+String someRand1 = "aAbBcC";
+String someRand2 = "xXyYzZ";
+String obfuscated = "";
+String unobfuscated = "";
+String shuffled1 = "";
+String shuffled2 = "";
+String randomInt1 = "";
+String randomInt2 = "";
+String randomStr1 = "";
+String randomStr2 = "";
+boolean verbose = true;
 ```
 
 and main library object:
@@ -362,8 +361,204 @@ decodedResult = dummyCastle.decodeWith(decrypted).toStringDecoded();
 System.out.println("Test: Symmetric result=" + ((decodedResult.equals(plainText)) ? "PASSED" : "FAILED")
     + getOpErrorStatus(dummyCastle));
 dummyCastle.reset();
+ }
+```
+and testAsymmEncryption() is:
 
-	}
+```java
+void testAsymmEncryption() {
+System.out.println("***Test asymmetric encryption***");
+CryptAsymmKeysPair cryptAsymmKeysPair = dummyCastle.genAsymmKeys();
+CryptAsymmPublicKey cryptAsymmPublicKey = cryptAsymmKeysPair.getCryptAsymmPublicKey();
+CryptAsymmPrivateKey cryptAsymmPrivateKey = cryptAsymmKeysPair.getCryptAsymmPrivateKey();
+
+System.out.println("*Test asymmetric encryption externally*");
+encrypted = dummyCastle.encryptAsymmWith(plainText, cryptAsymmPublicKey).getResult();
+if (verbose)
+System.out.println("Test: Asymmetric encryption=" + encrypted + getOpErrorStatus(dummyCastle));
+decrypted = dummyCastle.decryptAsymmWith(encrypted, cryptAsymmPrivateKey).getResult();
+if (verbose)
+System.out.println("Test: Asymmetric decryption=" + decrypted + getOpErrorStatus(dummyCastle));
+decodedResult = dummyCastle.decodeWith(decrypted).toStringDecoded();
+;
+System.out.println("Test: Asymmetric result=" + (decodedResult.equals(plainText) ? "PASSED" : "FAILED")
++ getOpErrorStatus(dummyCastle));
+dummyCastle.reset();
+
+System.out.println("*Test asymmetric encryption from source*");
+encrypted = "0000009a333835323632343536353337343134323232333835353032323831363039353832343031333939323839343836393334383439323230333833393938333230363530363336303034363538393736383237363931323933373331323835303938303134313731363932333435343734323137323637343136383132333435323633323438393032303232373430353438333231303534333238356b2937316a302f57140c163c11";
+String pub = "3050648331079197714843623445805135130729850255102544140887224657375482563080876790127317106805275373497518298601036749587025082479587574370867084455170723=@=5046681414847334363823497680505582547008051696988249793270100134042430048998694849893001642372341723686739425690696038035592605596450556906661936335457107";
+String priv = "2152374241593825319134227098618465774395685084445578076220700307631905644072705303010484875134566030047425527839702624538996411351348511657549884035109787=@=5046681414847334363823497680505582547008051696988249793270100134042430048998694849893001642372341723686739425690696038035592605596450556906661936335457107";
+cryptAsymmPublicKey = dummyCastle.genAsymmPublicKeyWith(pub);
+cryptAsymmPrivateKey = dummyCastle.genAsymmPrivateKeyWith(priv);
+
+decrypted = dummyCastle.decryptAsymmWith(encrypted, cryptAsymmPrivateKey).getResult();
+if (verbose)
+System.out.println("Test: Asymmetric decryption=" + decrypted + getOpErrorStatus(dummyCastle));
+decodedResult = dummyCastle.decodeWith(decrypted).toStringDecoded();
+;
+System.out.println("Test: Asymmetric descryption from source result="
++ (decodedResult.equals(plainText) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+System.out.println("*Test asymmetric encryption internally*");
+dummyCastle.fromStringDecoded(plainText);
+encrypted = dummyCastle.encryptAsymmWithKey(cryptAsymmPublicKey).getResult();
+if (verbose)
+System.out.println("Test: Symmetric encryption=" + encrypted + getOpErrorStatus(dummyCastle));
+decrypted = dummyCastle.decryptAsymmWithKey(cryptAsymmPrivateKey).getResult();
+if (verbose)
+System.out.println("Test: Symmetric decryption=" + decrypted + getOpErrorStatus(dummyCastle));
+decodedResult = dummyCastle.decodeWith(decrypted).toStringDecoded();
+;
+System.out.println("Test: Symmetric result=" + (decodedResult.equals(plainText) ? "PASSED" : "FAILED")
++ getOpErrorStatus(dummyCastle));
+dummyCastle.reset();
+}
+```
+and testHashing() is:
+
+```java
+void testHashing() {
+
+System.out.println("***Test hashing***");
+System.out.println("*Test hashing to number*");
+hashed1 = dummyCastle.hashToNumWith(plainText1).getResult();
+if (verbose)
+System.out.println("Test: Hashing to number 1=" + hashed1 + getOpErrorStatus(dummyCastle));
+hashed2 = dummyCastle.hashToNumWith(plainText1).getResult();
+if (verbose)
+System.out.println("Test: Hashing to number 2=" + hashed1 + getOpErrorStatus(dummyCastle));
+System.out.println("Test: Hashing to number idepotency result="
++ ((hashed1.equals(hashed2)) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+hashed2 = dummyCastle.hashToNumWith(plainText2).getResult();
+if (verbose)
+System.out.println("Test: Hashing to number 3=" + hashed2 + getOpErrorStatus(dummyCastle));
+System.out.println("Test: Hashing to number duplication result="
++ ((!hashed1.equals(hashed2)) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+System.out.println("*Test hashing to string*");
+hashed1 = dummyCastle.hashToStrWith(plainText1).getResult();
+if (verbose)
+System.out.println("Test: Hashing to string 1=" + hashed1 + getOpErrorStatus(dummyCastle));
+hashed2 = dummyCastle.hashToStrWith(plainText1).getResult();
+if (verbose)
+System.out.println("Test: Hashing to string 2=" + hashed1 + getOpErrorStatus(dummyCastle));
+System.out.println("Test: Hashing to string idepotency result="
++ ((hashed1.equals(hashed2)) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+hashed2 = dummyCastle.hashToStrWith(plainText2).getResult();
+if (verbose)
+System.out.println("Test: Hashing to string 3=" + hashed2 + getOpErrorStatus(dummyCastle));
+System.out.println("Test: Hashing to string duplication result="
++ ((!hashed1.equals(hashed2)) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+System.out.println("*Test hashing coherence*");
+hashed1 = dummyCastle.hashToStrWith(plainText1).getResult();
+if (verbose)
+System.out.println("Test: Hashing to string 4=" + hashed1 + getOpErrorStatus(dummyCastle));
+System.out.println("Test: Hashing to string coherence result="
++ ((hashed1.equals("091c6c3057c6665f")) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+System.out.println("*Test hashing internally*");
+hashed1 = dummyCastle.hashToStrWith(plainText1).getResult();
+dummyCastle.fromStringDecoded(plainText1);
+hashed2 = dummyCastle.hashToStr().getResult();
+System.out.println("Test: Hashing to string internal result="
++ ((hashed1.equals(hashed2)) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+dummyCastle.reset();
+}
+
+```
+
+and testShuffling() is:
+
+```java
+void testShuffling() {
+System.out.println("***Test shuffling***");
+shuffled1 = dummyCastle.shuffleWith(plainText).getResultDecoded();
+System.out.println("Test: Shuffling random result=" + ((shuffled1 != plainText) ? "PASSED" : "FAILED")
+    + getOpErrorStatus(dummyCastle));
+shuffled1 = dummyCastle.shuffleDeterministicWith(plainText, someRand1).getResultDecoded();
+System.out.println("Test: Shuffling deterministic result 1=" + ((shuffled1 != plainText) ? "PASSED" : "FAILED")
+    + getOpErrorStatus(dummyCastle));
+shuffled2 = dummyCastle.shuffleDeterministicWith(plainText, someRand1).getResultDecoded();
+System.out.println("Test: Shuffling deterministic result 2="
+    + ((shuffled1.equals(shuffled2)) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+System.out.println("Test: Shuffling coherence result="
+    + ((shuffled1.equals("teTTixtlPensa")) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+//
+System.out.println("*Test Shuffling internally*");
+dummyCastle.fromStringDecoded(plainText);
+shuffled1 = dummyCastle.shuffle().getResultDecoded();
+if (verbose)
+System.out.println("Test: Shuffling random result=" + shuffled1 + getOpErrorStatus(dummyCastle));
+System.out.println("Test: Shuffling internally result=" + ((!shuffled1.equals(plainText)) ? "PASSED" : "FAILED")
+    + getOpErrorStatus(dummyCastle));
+dummyCastle.reset();
+
+}
+```
+
+
+and testObfuscation() is:
+
+```java
+void testObfuscation() {
+System.out.println("*** Test obfuscation***");
+obfuscated = dummyCastle.obfuscateWith(plainText).getResult();
+if (verbose)
+    System.out.println("Test: obfuscation=" + obfuscated + getOpErrorStatus(dummyCastle));
+unobfuscated = dummyCastle.unobfuscateWith(obfuscated).getResult();
+if (verbose)
+    System.out.println("Test unobfuscation=" + unobfuscated + getOpErrorStatus(dummyCastle));
+System.out.println("Test: Obfuscation result=" + ((dummyCastle.toStringDecoded().equals(plainText)) ? "PASSED" : "FAILED")
+                + getOpErrorStatus(dummyCastle));
+dummyCastle.reset();
+}
+```
+
+and testObfuscation() is:
+
+```java
+void testRandomGeneration() {
+System.out.println("*** Test random generation***");
+randomInt1 = dummyCastle.randomNumWith(8).getResultDecoded();
+if (verbose)
+System.out.println("Test: random number=" + randomInt1 + getOpErrorStatus(dummyCastle));
+randomStr1 = dummyCastle.randomStrWith(8).getResultDecoded();
+if (verbose)
+System.out.println("Test: random string=" + randomStr1 + " " + getOpErrorStatus(dummyCastle));
+System.out.println("Test: random result=" + ((randomInt1.length() == 8) ? "PASSED" : "FAILED").toString()
++ getOpErrorStatus(dummyCastle));
+
+System.out.println("* Test deterministic generation*");
+randomInt1 = dummyCastle.randomDeterministicNumWith(someRand1, 8).getResult();
+if (verbose)
+System.out.println("Test: deterministic number=" + randomInt1 + " " + getOpErrorStatus(dummyCastle));
+randomInt2 = dummyCastle.randomDeterministicNumWith(someRand1, 8).getResult();
+if (verbose)
+System.out.println("Test: deterministic number=" + randomInt1 + getOpErrorStatus(dummyCastle));
+System.out.println("Test: random deterministic result="
++ ((randomInt1.equals(randomInt2)) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+System.out.println("Test: random deterministic coherence result="
++ ((randomInt1.equals("3637353832333233")) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+randomStr1 = dummyCastle.randomDeterministicStrWith(someRand1, 8).getResult();
+if (verbose)
+System.out.println("Test: deterministic number=" + randomStr1 + getOpErrorStatus(dummyCastle));
+randomStr2 = dummyCastle.randomDeterministicStrFromWith(someRand1, 6, 2).getResult();
+if (verbose)
+System.out.println("Test: deterministic number from=" + randomStr2 + getOpErrorStatus(dummyCastle));
+System.out.println("Test: random deterministic number from result="
++ ((randomStr1.endsWith(randomStr2)) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+dummyCastle.reset();
+
+}
+
 ```
 
 ## Additional information
