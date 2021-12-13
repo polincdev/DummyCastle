@@ -39,9 +39,7 @@ One simple object is enough to handle all the operations and methods.
 
 ```java
 import pl.polinc.dummycastle.DummyCastle;
- 
-### The clss
-
+  
 DummyCastle dummyCastle = new DummyCastle();
  
 String password="Password";
@@ -88,7 +86,22 @@ String plainText=dummyCastle.decodeWith(decrypted).toStringDecoded();
 
 ### Error handling
 
+The library tries to be as unobtrusive as possible that's why it handles all its exceptions internally. 
+Thanks to that there is no risk of NullPointerException, but at the cost of verbosity of error handling. 
+So if the exception occurs the value gets purged and limited to an empty string, but not nullified.
+In order to detect causes of potential errors two methods are provided: isError() and getException().
+The isError() method, as one may suspect, returns boolean value which indicate that at any point of calling methods of the library an exceptions has been thrown.
+This means that errors don't get reset by next operations. This poses a risk of calling chained methods which in sequence may work of erratic value.
+The second method returns the actual exceptions which may be used to retrieve informations concerning the issue. 
 
+```java
+//Any kind of operations. We assume it will throw an internal exception.
+String plainText=dummyCastle.decodeWith(decrypted).toStringDecoded();
+//If an exception occures, at this point the plainText == "". 
+//By checking the flag and printing the exceptions stack we may get the necesarry information
+if(dummyCastle.isError())
+    System.out.println(dummyCastle.getException());
+```
 
 ## Usage
 
@@ -157,12 +170,20 @@ cryptAsymmPrivateKey = dummyCastle.genAsymmPublicKeyWith(pub);
 decrypted = dummyCastle.decryptAsymmWith(encrypted, cryptAsymmPrivateKey).getResult();
 ```
 
-//Random generation
+### Random generation
 
+Basic
 ```java
 String randomInt1 = dummyCastle.randomNumWith(8).getResultDecoded();
 String randomStr1 = dummyCastle.randomStrWith(8).getResultDecoded();
 String randomInt2 = dummyCastle.randomDeterministicNumWith(someRand1, 8).getResult();
+```
+
+Basic
+```java
+//Generates 6 characters in a deterministic manner but start the generation from the '2' character.
+//This method is a counterpart of substring method but without generating the whole 8 characters.
+randomStr2 = dummyCastle.randomDeterministicStrFromWith(someRand1, 6, 2).getResult();
 ```
 
 ### Hashing
@@ -187,7 +208,6 @@ String dummyCastle.fromStringDecoded(plainText1);
 //Hash the data internally
 String hashed2 = dummyCastle.hashToStr().getResult();
 ```
- 
 
 ### Shuffling
 
@@ -207,16 +227,143 @@ dummyCastle.fromStringDecoded(plainText);
 String shuffled1 = dummyCastle.shuffle().getResultDecoded();
 ```
 
-//Obfuscation
+### Obfuscation
 
+Obfuscation is the process of creating data that is difficult to decompile, read and understand in order to protect intellectual property or trade secrets, and to prevent an attacker from reverse engineering a proprietary software program.
+
+Simple
 ```java
 String obfuscated = dummyCastle.obfuscateWith(plainText).getResult();
 String unobfuscated = dummyCastle.unobfuscateWith(obfuscated).getResult();
 ```
 
-//Clean up - optional
+Advanced
+```java
+dummyCastle.fromStringDecoded(plainText);
+String obfuscated = dummyCastle.obfuscate().getResult();
+String unobfuscated = dummyCastle.unobfuscateWith(obfuscated).getResultDecoded();
+        
+```
+ 
+##Clean up - optional
+
+The cleaning up is not required. What it does is resetting the main value to an empty string, setting the error flag to false and resetting the excetion.
+
 ```java
 dummyCastle.reset();
+```
+
+## Test
+
+The below tests were prepared without use of any kind of testing framework in order to make them compatible between Java and Dart. 
+
+Given the following variables:
+
+```java
+// Vars
+	String password = "Password";
+	String plainText = "TestPlainText";
+	String plainText1 = "TestPlainText1";
+	String plainText2 = "TestPlainText2";
+	String encrypted = "";
+	String decrypted = "";
+	String hashed1 = "";
+	String hashed2 = "";
+	String decodedResult = "";
+	String someRand1 = "aAbBcC";
+	String someRand2 = "xXyYzZ";
+	String obfuscated = "";
+	String unobfuscated = "";
+	String shuffled1 = "";
+	String shuffled2 = "";
+	String randomInt1 = "";
+	String randomInt2 = "";
+	String randomStr1 = "";
+	String randomStr2 = "";
+	boolean verbose = true;
+
+```
+
+and main library object:
+
+```java
+DummyCastle dummyCastle = new DummyCastle();
+```
+
+as well as a helper method:
+
+```java
+String getOpErrorStatus(DummyCastle dummyCastle) {
+		return " [Error=" + dummyCastle.isError() + " " + dummyCastle.getException() + "]";
+	}
+```
+
+we can call a set of testing methods:
+
+```java
+/* SYMMETRIC ENCRYPTION */
+testSymmEncryption();
+
+/* ASYMMETRIC ENCRYPTION */
+testAsymmEncryption();
+
+/* HASHING */
+testHashing();
+
+/* SHUFFLING */
+testShuffling();
+
+/* OBFUSCATION */
+testObfuscation();
+
+/* RANDOM */
+testRandomGeneration();
+```
+
+where testSymmEncryption() is:
+
+```java
+void testSymmEncryption() {
+System.out.println("***Test symmetric encryption***");
+//
+dummyCastle.genSymmKeyWith(password);
+if (verbose)
+System.out.println("Test: Symmetric key generation=" + dummyCastle.getSymmKey().toString()
+        + getOpErrorStatus(dummyCastle));
+//
+System.out.println("*Test symmetric encryption externally*");
+encrypted = dummyCastle.encryptSymmWith(plainText).getResult();
+if (verbose)
+System.out.println("Test: Symmetric encryption=" + encrypted + getOpErrorStatus(dummyCastle));
+decrypted = dummyCastle.decryptSymmWith(encrypted).getResult();
+if (verbose)
+System.out.println("Test: Symmetric decryption=" + decrypted + getOpErrorStatus(dummyCastle));
+decodedResult = dummyCastle.decodeWith(decrypted).toStringDecoded();
+System.out.println("Test: Symmetric result=" + (decodedResult.equals(plainText) ? "PASSED" : "FAILED")
+    + getOpErrorStatus(dummyCastle));
+
+//
+dummyCastle.reset();
+//
+dummyCastle.genSymmKeyWith(password);
+if (verbose)
+System.out.println("Test: Symmetric key generation=" + dummyCastle.getSymmKey().toString()
+        + getOpErrorStatus(dummyCastle));
+//
+System.out.println("*Test symmetric encryption internally*");
+dummyCastle.fromStringDecoded(plainText);
+encrypted = dummyCastle.encryptSymm().getResult();
+if (verbose)
+System.out.println("Test: Symmetric encryption=" + encrypted + getOpErrorStatus(dummyCastle));
+decrypted = dummyCastle.decryptSymm().getResult();
+if (verbose)
+System.out.println("Test: Symmetric decryption=" + decrypted + getOpErrorStatus(dummyCastle));
+decodedResult = dummyCastle.decodeWith(decrypted).toStringDecoded();
+System.out.println("Test: Symmetric result=" + ((decodedResult.equals(plainText)) ? "PASSED" : "FAILED")
+    + getOpErrorStatus(dummyCastle));
+dummyCastle.reset();
+
+	}
 ```
 
 ## Additional information
