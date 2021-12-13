@@ -520,7 +520,7 @@ dummyCastle.reset();
 }
 ```
 
-and testObfuscation() is:
+and testRandomGeneration() is:
 
 ```java
 void testRandomGeneration() {
