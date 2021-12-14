@@ -37,6 +37,14 @@ Everything is preconfigured and there is no need to have any kind knowledge abou
 
 ## Getting started
 
+### Installation
+<img align="middle" src="https://github.com/polincdev/DummyCastle/blob/master/img/badge.png" data-canonical-src="https://github.com/polincdev/DummyCastle/blob/master/img/badge.png" width="12" height="18" />
+
+```groovy
+implementation 'pl.polinc.dummycastle:dummycastle:1.1.0'
+```
+
+### Code
 One simple object is enough to handle all the operations and methods.
 
 ```java
