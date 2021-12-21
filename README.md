@@ -468,12 +468,25 @@ System.out.println("Test: Hashing to string 3=" + hashed2 + getOpErrorStatus(dum
 System.out.println("Test: Hashing to string duplication result="
 + ((!hashed1.equals(hashed2)) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
 
-System.out.println("*Test hashing coherence*");
+System.out.println("*Test hashing to non-standart lenght string*");
+hashed1 = dummyCastle.hashToStrWithTextAndLength(plainText1,20).getResult();
+if (verbose)
+System.out.println("Test: Hashing to non-standart string 1=" + hashed1 + getOpErrorStatus(dummyCastle));
+
+
+   System.out.println("*Test hashing coherence*");
 hashed1 = dummyCastle.hashToStrWith(plainText1).getResult();
 if (verbose)
 System.out.println("Test: Hashing to string 4=" + hashed1 + getOpErrorStatus(dummyCastle));
 System.out.println("Test: Hashing to string coherence result="
 + ((hashed1.equals("091c6c3057c6665f")) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
+hashed1 = dummyCastle.hashToStrWithTextAndLength(plainText1,20).getResult();
+if (verbose)
+System.out.println("Test: Hashing to string 5=" + hashed1 + getOpErrorStatus(dummyCastle));
+System.out.println("Test: Hashing to string coherence result 2="
++ ((hashed1.equals("0bdf72e1c5734009658b0a1944d4971053a45432")) ? "PASSED" : "FAILED") + getOpErrorStatus(dummyCastle));
+
 
 System.out.println("*Test hashing internally*");
 hashed1 = dummyCastle.hashToStrWith(plainText1).getResult();
