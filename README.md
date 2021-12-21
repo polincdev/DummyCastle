@@ -33,7 +33,7 @@ The library provides the following features:
 - shuffling
 - obfuscation
 
-Everything is preconfigured and there is no need to have any kind knowledge about cryptography other than this short manual  
+Everything is preconfigured and there is no need to have any kind knowledge about cryptography other than this short manual.  
 
 ## Getting started
 
@@ -71,7 +71,7 @@ String randomInt = dummyCastle.randomNumWith(8).genSymmKeyWith("Password").encry
 
 ### Encoding
 
-DummyCastle keeps the processed value as an array of bytes. It may be retrieved from the object using couple of methods.
+DummyCastle keeps the processed value internally as an array of bytes. It may be retrieved from the object using couple of methods.
 In general the output from the library is encoded using HEX encoding. The reason behind it is to prevent any platform specific problems related to encoding. 
 The result might be retrieved using getResult() or toString() methods. 
 
@@ -79,7 +79,7 @@ The result might be retrieved using getResult() or toString() methods.
 String randomIntDecoded = dummyCastle.randomNumWith(8).getResult();
 ```
 
-The raw output might be retrieved as a string using getResultDecoded() or as an array of bytes using getResultDecodedRaw():
+The raw/decoded output might be retrieved as a string using getResultDecoded() or as an array of bytes using getResultDecodedRaw():
 
 ```java
 String randomIntPlain = dummyCastle.randomNumWith(8).getResultDecoded();
