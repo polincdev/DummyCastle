@@ -44,7 +44,7 @@ Everything is preconfigured and there is no need to have any kind knowledge abou
 
 
 ```groovy
-implementation 'pl.polinc.dummycastle:dummycastle:1.1.0'
+implementation 'pl.polinc.dummycastle:dummycastle:1.2.0'
 ```
 
 ### Code
